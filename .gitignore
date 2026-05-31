@@ -1,0 +1,8 @@
+# compiled binaries (rebuilt from source)
+example/benchmark
+example/gpubench
+*.o
+*.dSYM/
+# scratch files the benchmarks create and delete
+.bench.tmp
+.disktest.tmp
