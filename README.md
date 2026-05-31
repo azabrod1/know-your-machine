@@ -11,7 +11,7 @@ You get two things back:
    machine*: what a clock cycle is, why one core runs ~6 instructions at once,
    your actual cache hierarchy drawn by latency cliffs, the branch predictor, SIMD,
    the TLB, the disk, and (on a Mac) the GPU.
-2. **`summary.html`** — a self-contained one-page infographic of the results you
+2. **`dashboard.html`** — a self-contained one-page dashboard of the results you
    can open offline and share.
 
 ## What it measures
@@ -49,7 +49,7 @@ Then just ask Claude:
 > *measure my machine*
 
 Claude detects your hardware, adapts the benchmark to it, runs it, and writes
-your report and infographic.
+your report and dashboard.
 
 ## Portability
 

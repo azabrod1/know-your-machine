@@ -3,7 +3,7 @@ name: know-your-machine
 description: >-
   Measure THIS computer's CPU, memory hierarchy, storage, and GPU from first
   principles — using nothing but timed loops — then write a personalized
-  textbook-style report and a one-page HTML infographic of the results. Use when
+  textbook-style report and a one-page HTML dashboard of the results. Use when
   the user wants to benchmark their machine, understand how fast their computer
   really is, see their cache/memory hierarchy, or generate a hardware
   performance write-up. The included code is an Apple-Silicon reference EXAMPLE;
@@ -26,12 +26,12 @@ example/
                 emits JSON on stdout, progress on stderr
   gpubench.m    reference Metal program: GPU TFLOP/s, occupancy, bandwidth
   report.md     a complete EXAMPLE write-up (the gold-standard voice & structure)
-  summary.html  a complete EXAMPLE one-page infographic (the visual target)
+  dashboard.html  a complete EXAMPLE one-page dashboard (the visual target)
 ```
 
 **The example is written for Apple Silicon (arm64 + macOS).** Your job is to
 *port it to the machine you're actually running on*, run it, and produce the
-equivalent report + infographic for that machine. The example shows the target
+equivalent report + dashboard for that machine. The example shows the target
 quality; it is not expected to run unchanged on Windows or x86 Linux.
 
 ## The one rule (carry it into the report)
@@ -92,13 +92,18 @@ CPU-vs-GPU "two philosophies of hiding latency" finale. Interpret the user's
 *actual* numbers (don't copy the example's); compare to typical hardware so they
 know if a result is high/low.
 
-### 6. Generate the infographic (model on `example/summary.html`)
-A single self-contained `.html` file (inline CSS, no external dependencies, opens
-offline) filled with THIS machine's numbers: the memory-hierarchy ladder with the
-"1 cycle = 1 second" human scale, the core-scaling and cache-cliff charts, the
-compute peaks, and the CPU-vs-GPU comparison. Then show it to the user.
+### 6. Generate the dashboard (model on `example/dashboard.html`)
+A single self-contained `.html` file (inline CSS + inline SVG, no external
+dependencies, opens offline). This is a **dense data readout, not an essay** —
+let the numbers and charts carry it; strip the prose. Pack in THIS machine's
+measured values: headline stat tiles, the memory-hierarchy table with the "1
+cycle = 1 second" scale, inline-SVG line charts for every sweep we have
+(cache-latency-vs-size, core scaling, bandwidth saturation, disk block-size, GPU
+occupancy), and compact key/value cards for the scalar results (superscalar,
+SIMD, branch, TLB, access pattern, disk, GPU, CPU-vs-GPU). Keep narrative/
+explanation in `report.md`; the dashboard is just the data. Then show it to the user.
 
 ## Deliverables
 1. The ported benchmark source (so the user can re-run it).
 2. `report.md` — their machine's textbook.
-3. `summary.html` — their machine's one-page infographic.
+3. `dashboard.html` — their machine's one-page dashboard.
