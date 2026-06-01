@@ -62,7 +62,31 @@ applicable), RAM, cache sizes, page size, and whether a usable GPU exists.
 - Windows: `wmic`/PowerShell `Get-CimInstance`, `Get-ComputerInfo`
 
 ### 2. Port the benchmark to this machine
-Read `example/benchmark.c`. Everything platform-specific is tagged `[[PORT]]`.
+**This is the hard part, and it is a real engineering task — think it through, do
+not translate mechanically.** The example is Apple-Silicon-specific. Making it
+measure the *same things* on a different chip means reasoning about what each test
+actually depends on, not swapping mnemonics and hoping. For every test ask: *what
+is this technique relying on, and does that still hold here?*
+- The clock measurement only works if the operations genuinely **serialize** (a
+  true dependency chain) — confirm your ported version can't be run in parallel or
+  optimized away.
+- The branch test only works if a **real, data-dependent branch survives the
+  compiler** — verify it does (inspect the asm/disassembly); do NOT use `-O0`,
+  which de-optimizes everything and ruins every other number.
+- The cache/TLB sweeps assume specific **line and page sizes** — read the real
+  ones for this machine.
+- Throughput tests assume the compiler didn't **strength-reduce or vectorize** the
+  loop away — make sure the work actually runs.
+
+Prefer the **simplest approach you can verify** (often portable C with `volatile`
+/ compiler barriers) over a clever inline-asm port you can't check. After running,
+**sanity-check every number** against what's physically plausible for the hardware
+(clock near the chip's rated speed, IPC ≤ the core's width, bandwidth ≤ the memory
+spec, latencies that rise monotonically down the hierarchy). If a number is
+impossible, the port is wrong — fix it, don't report it. State clearly anything
+you couldn't measure or had to approximate.
+
+Everything platform-specific in `example/benchmark.c` is tagged `[[PORT]]`.
 Adapt, keeping the *method* identical even when the code changes:
 - **Inline asm** is arm64 (`add`, `cmp/b.lo`, `csel`, NEON `.4s`, `fmla`). On
   x86-64 use the equivalent mnemonics/intrinsics (SSE/AVX), or a portable-C

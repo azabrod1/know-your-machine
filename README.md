@@ -37,12 +37,36 @@ You get two HTML files back:
 > measured are elapsed time and instruction counts. "GHz" and "cycles" are those
 > divided, resting on one stated assumption — and the report always says so.
 
+## Requirements
+
+- **[Claude Code](https://claude.com/claude-code)** (the skill runs there).
+- **A C compiler** — `cc`/`clang` (preinstalled on macOS) or `gcc`
+  (`build-essential` on Linux). On a Mac, the Xcode command-line tools also enable
+  the Metal GPU test.
+- **A top-tier, high-reasoning agent — strongly recommended.** This skill doesn't
+  just run a script: it asks the agent to *port* low-level benchmark code (inline
+  assembly, system calls, cache/page detection) to your specific CPU, reason about
+  whether each measurement is still valid, and then write a genuine explanatory
+  textbook. That's demanding. Use a frontier model at high reasoning effort — e.g.
+  **Claude Opus (high effort)** or a top-tier GPT reasoning model. A small or fast
+  model will produce shakier ports and thinner explanations.
+
+## What you'll get
+
+Two self-contained HTML files for *your* machine — no dependencies, open offline,
+safe to email or share:
+- **`textbook.html`** — a 12-chapter illustrated read on how your chip works,
+  charts woven into each chapter.
+- **`dashboard.html`** — a one-page data readout of every measured number.
+
+Plus the ported benchmark source, so you can re-run it any time.
+
 ## Install
 
 Clone into your Claude Code skills directory:
 
 ```sh
-git clone https://github.com/<you>/know-your-machine.git \
+git clone https://github.com/azabrod1/know-your-machine.git \
   ~/.claude/skills/know-your-machine
 ```
 
@@ -50,8 +74,8 @@ Then just ask Claude:
 
 > *measure my machine*
 
-Claude detects your hardware, adapts the benchmark to it, runs it, and writes
-your report and dashboard.
+Claude detects your hardware, adapts the benchmark to it, runs it (~30–45 s), and
+writes your textbook and dashboard, then opens them.
 
 ## Portability
 
