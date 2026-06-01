@@ -25,12 +25,12 @@ example/
   benchmark.c   reference C program (Apple Silicon): all CPU/memory/disk tests,
                 emits JSON on stdout, progress on stderr
   gpubench.m    reference Metal program: GPU TFLOP/s, occupancy, bandwidth
-  report.md     the EXAMPLE textbook in markdown (the gold-standard voice/structure)
-  report.html   the same textbook as HTML, charts woven into the chapters
+  textbook.md     the EXAMPLE textbook in markdown (the gold-standard voice/structure)
+  textbook.html   the same textbook as HTML, charts woven into the chapters
   dashboard.html  a complete EXAMPLE one-page data dashboard (the scan-it view)
 ```
 
-Two HTML deliverables, two jobs: **`report.html`** is the deep read (the
+Two HTML deliverables, two jobs: **`textbook.html`** is the deep read (the
 chaptered narrative with its graphics inline); **`dashboard.html`** is the
 glance (dense numbers + charts, one insight line each). Generate both.
 
@@ -66,7 +66,7 @@ Adapt, keeping the *method* identical even when the code changes:
   fallback with `volatile`/compiler barriers when precise control isn't critical.
 - **Forced branch** (branch-prediction test): must stay a real, compiler-proof
   branch. Inline asm is cleanest; do NOT rely on `-O0` (it de-optimizes
-  everything and ruins the numbers — see `report.md` Chapter 7).
+  everything and ruins the numbers — see `textbook.md` Chapter 7).
 - **CPU/cache info**: `sysctl` → `/proc` or registry.
 - **Uncached disk I/O**: `F_NOCACHE` (macOS) → `O_DIRECT` (Linux) → `FILE_FLAG_NO_BUFFERING` (Windows). Always: check free space, write a modest temp file ONCE, `unlink` it immediately (or delete in a `finally`), prefer reads.
 - **Page size**: don't hardcode 16 KB; read it (x86 is 4 KB) for the TLB test.
@@ -85,10 +85,10 @@ throttling protects it), but: keep the disk temp file small and always delete
 it; don't fill the disk; warn before any sustained all-core run if the user is
 on battery or doing other work.
 
-### 5. Write the report as HTML (model on `example/report.html`)
+### 5. Write the textbook as HTML (model on `example/textbook.html`)
 Produce a chaptered, narrative textbook personalized to THIS machine's numbers,
-as a self-contained `report.html` (inline CSS + inline SVG, opens offline) with
-the charts woven into the chapters — same prose voice as `report.md`, but HTML
+as a self-contained `textbook.html` (inline CSS + inline SVG, opens offline) with
+the charts woven into the chapters — same prose voice as `textbook.md`, but HTML
 so the graphics live inside the story. Match the example's voice: each chapter
 asks one question, shows the measured result (as a small chart or result block),
 explains the mechanism in plain language, states the honest caveats, and sets up
@@ -98,7 +98,7 @@ the next. Carry the two recurring themes the data keeps proving:
 End with the full hierarchy ladder (registers → … → disk) and, if measured, the
 CPU-vs-GPU "two philosophies of hiding latency" finale. Interpret the user's
 *actual* numbers (don't copy the example's); compare to typical hardware so they
-know if a result is high/low. (Optionally also emit a plain `report.md`.)
+know if a result is high/low. (Optionally also emit a plain `textbook.md`.)
 
 ### 6. Generate the dashboard (model on `example/dashboard.html`)
 A single self-contained `.html` file (inline CSS + inline SVG, no external
@@ -109,10 +109,25 @@ table with the "1 cycle = 1 second" scale, inline-SVG line charts for every swee
 we have (cache-latency-vs-size, core scaling, bandwidth saturation, disk
 block-size, GPU occupancy), and compact key/value cards for the scalar results
 (superscalar, SIMD, branch, TLB, access pattern, disk, GPU, CPU-vs-GPU), each with
-its one-liner. The long-form narrative lives in `report.html`; the dashboard is
-the data plus a single takeaway per panel. Then show both to the user.
+its one-liner. The long-form narrative lives in `textbook.html`; the dashboard is
+the data plus a single takeaway per panel.
+
+### 7. Walk the user through what they got and how to open it
+Don't assume they know where the files are or what they are — spell it out, with
+full paths:
+- **`textbook.html`** — *the read.* Open in a browser to learn how their machine
+  works, chapter by chapter, with the charts inline.
+- **`dashboard.html`** — *the scan.* A one-page visual of all the numbers.
+- **the benchmark source** — keep it; recompile and re-run anytime to compare.
+
+Both HTML files are fully self-contained (no internet, no dependencies): they can
+be double-clicked from Finder / File Explorer, opened offline, or emailed and
+shared as-is. Then actually open them for the user:
+- macOS: `open textbook.html dashboard.html`
+- Linux: `xdg-open textbook.html` (and `dashboard.html`)
+- Windows: `start textbook.html` (and `dashboard.html`)
 
 ## Deliverables
 1. The ported benchmark source (so the user can re-run it).
-2. `report.html` — their machine's textbook (narrative + graphics inline).
+2. `textbook.html` — their machine's textbook (narrative + graphics inline).
 3. `dashboard.html` — their machine's one-page data dashboard.

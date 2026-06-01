@@ -7,14 +7,14 @@ and then explains what every number means.
 
 You get two HTML files back:
 
-1. **`report.html`** — a chaptered, textbook-style read *for your specific
+1. **`textbook.html`** — a chaptered, textbook-style read *for your specific
    machine*, charts woven into the story: what a clock cycle is, why one core runs
    ~6 instructions at once, your actual cache hierarchy drawn by latency cliffs,
    the branch predictor, SIMD, the TLB, the disk, and (on a Mac) the GPU.
 2. **`dashboard.html`** — the same results as a dense one-page data dashboard you
    can scan, open offline, and share.
 
-(The textbook is also written to `report.md` if you want plain markdown.)
+(The textbook is also written to `textbook.md` if you want plain markdown.)
 
 ## What it measures
 
@@ -59,7 +59,7 @@ The code in `example/` is a **worked reference for Apple Silicon (arm64 + macOS)
 The skill instructs the agent to **port it to whatever machine it's running on** —
 x86, Linux, Windows — keeping the *method* identical even where the inline
 assembly, system calls, and cache-info APIs differ. See `SKILL.md` for how, and
-`example/report.md` for the gold-standard write-up the agent emulates.
+`example/textbook.md` for the gold-standard write-up the agent emulates.
 
 ---
 
