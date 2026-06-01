@@ -98,9 +98,13 @@ explains the mechanism in plain language, states the honest caveats, and sets up
 the next. **Teach — don't just state facts.** Assume the reader has never heard
 of the concept: build from something familiar, explain how the mechanism actually
 works (a concrete picture, tiny diagram, or analogy where it helps), and say what
-the numbers *mean* and whether they're high or low. A paragraph that only asserts
-("a SIMD register holds four, so it does four at once") has failed; show *why* and
-*what it buys*. Aim for real understanding, not a caption. Carry the two recurring
+the numbers *mean* and whether they're high or low. When a chapter introduces a
+piece of hardware, first **ground it**: say plainly *what it is* and *how it
+differs from its neighbors* (e.g. an SSD is non-volatile storage that keeps your
+data with no power, versus RAM which is fast but wiped on shutdown) before you
+measure it. A paragraph that only asserts ("a SIMD register holds four, so it does
+four at once") has failed; show *why* and *what it buys*. Aim for real
+understanding, not a caption. Carry the two recurring
 themes the data keeps proving:
 - **Independence (ILP)** — dependent vs independent work; the speed of overlap.
 - **Locality** — is the data reachable cheaply; the cache/prefetcher story.

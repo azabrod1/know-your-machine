@@ -192,9 +192,17 @@ system timer) agree on the elapsed time to <span class="hi">0.00%</span></div>
 
   <!-- 5 -->
   <h2 id="c5"><span class="c">Chapter 5</span>The memory wall</h2>
-  <p>Every add so far used only <b>registers</b> — the tiny handful of storage slots built directly into the core, the
-    fastest memory there is. Real programs can't fit in a handful of slots; they constantly reach out to main memory.
-    And reaching into memory is where a fast core goes to <b>wait</b>.</p>
+  <p>Every add so far used only <b>registers</b> — the few dozen named storage slots built directly into the core,
+    holding the exact values it's operating on this instant. They're the fastest memory that exists (the value is
+    already inside the execution unit), but there are only a tiny handful. Everything else your program touches lives in
+    <b>main memory</b>, or RAM: billions of slots on separate memory chips, holding all the code and data of every
+    running program at once. RAM is vastly roomier than the registers — gigabytes versus a few hundred bytes — but it's
+    physically off to the side, a journey away across the chip. And a journey is exactly what it is: reaching into main
+    memory is where a fast core goes to <b>wait</b>.</p>
+  <p>So the chip keeps <b>caches</b> in between — small, fast copies of the most recently used slices of memory, parked
+    right next to the core so most accesses never have to make the full trip. You never ask for a cache by name; the
+    hardware fills and manages it automatically, betting you'll reuse data you just touched. How big a bet, and how much
+    it pays off, is the whole shape of the next chart.</p>
   <p>To measure that wait with nothing else mixed in, we use a <b>pointer chase</b>: lay out a buffer so that each slot
     tells you which slot to read next, in a random order. Because each read's <i>address</i> comes from the previous
     read's <i>result</i>, the core can't run them in parallel or guess ahead — it must do them strictly one after
@@ -318,12 +326,25 @@ v1 = [  4 |  2 |  9 |  6 ]
 
   <!-- 10 -->
   <h2 id="c10"><span class="c">Chapter 10</span>All the way down: the SSD</h2>
-  <p>Below main memory sits storage — the SSD. It's the bottom of the ladder, and the drop is staggering: a random read
-    takes about <b>71 microseconds</b>, which at this clock is roughly <b>315,000 cycles</b> — about 760× slower than
-    DRAM, and 80,000× slower than an L1 hit. But the headline lesson here isn't the raw latency, it's that <i>how</i> you
-    ask matters enormously. Every read from disk is a <b>system call</b>: a round trip from your program down into the
-    operating system and back, with a fixed cost each time.</p>
-  <p>Watch what happens when we read the same 512&nbsp;MB file but vary the chunk size we ask for:</p>
+  <p>Below main memory sits <b>storage</b> — on this machine, an SSD (solid-state drive). This is where your data
+    actually <i>lives</i>: the operating system, your apps, your photos and documents all sit on the SSD, and they stay
+    there whether the machine is powered on or off. That permanence is the deep difference from everything above it in
+    this course. Main memory — the RAM from Chapter 5 — is <b>volatile</b>: blazing-fast working space that is wiped the
+    instant power drops. Storage is <b>non-volatile</b>: it holds your bits with no power at all, which is exactly why
+    your files survive a shutdown. The mental model: RAM is the desk you spread your work across <i>while</i> you're
+    using it; the SSD is the filing cabinet that work is filed back into. When you launch an app, the system first
+    <i>copies</i> it off the SSD into RAM, and the CPU works from the fast copy.</p>
+  <p>An SSD stores those bits in <b>flash memory</b> — grids of microscopic cells that trap a little electric charge to
+    remember each 1 or 0, with no moving parts (that's the "solid-state" part, as opposed to the spinning magnetic
+    platters of an old hard drive). Permanence and huge capacity come at a steep price in speed, for two reasons: the
+    SSD isn't wired into the fast memory channels beside the CPU — it sits much further away, reached over a storage bus
+    through its own controller chip — and flash cells are simply slower to read than DRAM. So it's the bottom of the
+    latency ladder, and the drop is staggering: a random read takes about <b>71 microseconds</b>, roughly
+    <b>315,000 cycles</b> at this clock — about 760× slower than DRAM, and 80,000× slower than an L1 hit.</p>
+  <p>But the headline lesson here isn't the raw latency, it's that <i>how</i> you ask matters enormously. Your program
+    can't touch the drive directly; it has to ask the operating system, and each such request is a <b>system call</b> —
+    a round trip down into the OS, out to the device, and back, with a fixed cost every time. Watch what happens when we
+    read the same 512&nbsp;MB file but vary the chunk size we request:</p>
   <div class="fig"><h3>reading one 512 MB file, by request size · GB/s</h3>
     <svg viewBox="0 0 360 166" class="chart">
       <defs><linearGradient id="gD" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--green)" stop-opacity=".35"/><stop offset="1" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs>
