@@ -95,7 +95,13 @@ the charts woven into the chapters — same prose voice as `textbook.md`, but HT
 so the graphics live inside the story. Match the example's voice: each chapter
 asks one question, shows the measured result (as a small chart or result block),
 explains the mechanism in plain language, states the honest caveats, and sets up
-the next. Carry the two recurring themes the data keeps proving:
+the next. **Teach — don't just state facts.** Assume the reader has never heard
+of the concept: build from something familiar, explain how the mechanism actually
+works (a concrete picture, tiny diagram, or analogy where it helps), and say what
+the numbers *mean* and whether they're high or low. A paragraph that only asserts
+("a SIMD register holds four, so it does four at once") has failed; show *why* and
+*what it buys*. Aim for real understanding, not a caption. Carry the two recurring
+themes the data keeps proving:
 - **Independence (ILP)** — dependent vs independent work; the speed of overlap.
 - **Locality** — is the data reachable cheaply; the cache/prefetcher story.
 End with the full hierarchy ladder (registers → … → disk) and, if measured, the
@@ -110,7 +116,10 @@ cap each panel with **one sharp insight line** (the "so what"), never paragraphs
 Pack in THIS machine's measured values: headline stat tiles, the memory-hierarchy
 table with the "1 cycle = 1 second" scale, inline-SVG line charts for every sweep
 we have (cache-latency-vs-size, core scaling, bandwidth saturation, disk
-block-size, GPU occupancy), and compact key/value cards for the scalar results
+block-size, GPU occupancy) — every chart with **labeled axes**: y-tick values, an
+x-label at every data point, and value callouts on the key points (a chart with
+only bare endpoint labels hides the data and is not acceptable) — and compact
+key/value cards for the scalar results
 (superscalar, SIMD, branch, TLB, access pattern, disk, GPU, CPU-vs-GPU), each with
 its one-liner. The long-form narrative lives in `textbook.html`; the dashboard is
 the data plus a single takeaway per panel.
