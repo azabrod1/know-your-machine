@@ -77,6 +77,23 @@ Then just ask Claude:
 Claude detects your hardware, adapts the benchmark to it, runs it (~30–45 s), and
 writes your textbook and dashboard, then opens them.
 
+## Works with any coding agent (Codex, etc.)
+
+The instructions in `SKILL.md` are agent-agnostic — they're just "compile this,
+run it, write these files." Any capable agent can run them:
+
+- **Claude Code** — clone into `~/.claude/skills/know-your-machine` (above); it's
+  auto-discovered. Say *measure my machine*.
+- **OpenAI Codex** — clone the repo anywhere, run `codex` **inside that folder**
+  (Codex auto-reads the repo's [`AGENTS.md`](AGENTS.md), which points it at
+  `SKILL.md`), then say *measure my machine*.
+- **Cursor / Gemini CLI / anything else** — clone it, open your agent in the
+  folder, and tell it to *follow SKILL.md to measure this machine*.
+
+Whatever the tool, **use a high-reasoning model** — porting low-level benchmark
+code and explaining it well is demanding, and a small/fast model will produce
+shakier ports and thinner writeups.
+
 ## Portability
 
 The code in `example/` is a **worked reference for Apple Silicon (arm64 + macOS)**.
