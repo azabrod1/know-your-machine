@@ -25,9 +25,14 @@ example/
   benchmark.c   reference C program (Apple Silicon): all CPU/memory/disk tests,
                 emits JSON on stdout, progress on stderr
   gpubench.m    reference Metal program: GPU TFLOP/s, occupancy, bandwidth
-  report.md     a complete EXAMPLE write-up (the gold-standard voice & structure)
-  dashboard.html  a complete EXAMPLE one-page dashboard (the visual target)
+  report.md     the EXAMPLE textbook in markdown (the gold-standard voice/structure)
+  report.html   the same textbook as HTML, charts woven into the chapters
+  dashboard.html  a complete EXAMPLE one-page data dashboard (the scan-it view)
 ```
+
+Two HTML deliverables, two jobs: **`report.html`** is the deep read (the
+chaptered narrative with its graphics inline); **`dashboard.html`** is the
+glance (dense numbers + charts, one insight line each). Generate both.
 
 **The example is written for Apple Silicon (arm64 + macOS).** Your job is to
 *port it to the machine you're actually running on*, run it, and produce the
@@ -80,17 +85,20 @@ throttling protects it), but: keep the disk temp file small and always delete
 it; don't fill the disk; warn before any sustained all-core run if the user is
 on battery or doing other work.
 
-### 5. Write the report (model on `example/report.md`)
-Produce a chaptered, narrative write-up personalized to THIS machine's numbers.
-Match the example's voice: each chapter asks one question, shows the measured
-result, explains the mechanism in plain language, states the honest caveats, and
-sets up the next chapter. Carry the two recurring themes the data keeps proving:
+### 5. Write the report as HTML (model on `example/report.html`)
+Produce a chaptered, narrative textbook personalized to THIS machine's numbers,
+as a self-contained `report.html` (inline CSS + inline SVG, opens offline) with
+the charts woven into the chapters — same prose voice as `report.md`, but HTML
+so the graphics live inside the story. Match the example's voice: each chapter
+asks one question, shows the measured result (as a small chart or result block),
+explains the mechanism in plain language, states the honest caveats, and sets up
+the next. Carry the two recurring themes the data keeps proving:
 - **Independence (ILP)** — dependent vs independent work; the speed of overlap.
 - **Locality** — is the data reachable cheaply; the cache/prefetcher story.
 End with the full hierarchy ladder (registers → … → disk) and, if measured, the
 CPU-vs-GPU "two philosophies of hiding latency" finale. Interpret the user's
 *actual* numbers (don't copy the example's); compare to typical hardware so they
-know if a result is high/low.
+know if a result is high/low. (Optionally also emit a plain `report.md`.)
 
 ### 6. Generate the dashboard (model on `example/dashboard.html`)
 A single self-contained `.html` file (inline CSS + inline SVG, no external
@@ -101,10 +109,10 @@ table with the "1 cycle = 1 second" scale, inline-SVG line charts for every swee
 we have (cache-latency-vs-size, core scaling, bandwidth saturation, disk
 block-size, GPU occupancy), and compact key/value cards for the scalar results
 (superscalar, SIMD, branch, TLB, access pattern, disk, GPU, CPU-vs-GPU), each with
-its one-liner. Keep the long-form narrative in `report.md`; the dashboard is the
-data plus a single takeaway per panel. Then show it to the user.
+its one-liner. The long-form narrative lives in `report.html`; the dashboard is
+the data plus a single takeaway per panel. Then show both to the user.
 
 ## Deliverables
 1. The ported benchmark source (so the user can re-run it).
-2. `report.md` — their machine's textbook.
-3. `dashboard.html` — their machine's one-page dashboard.
+2. `report.html` — their machine's textbook (narrative + graphics inline).
+3. `dashboard.html` — their machine's one-page data dashboard.

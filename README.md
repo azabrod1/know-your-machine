@@ -5,14 +5,16 @@ into a physics experiment: it measures your CPU, memory hierarchy, storage, and
 GPU **from first principles** — using nothing but timed loops, no spec sheets —
 and then explains what every number means.
 
-You get two things back:
+You get two HTML files back:
 
-1. **`report.md`** — a chaptered, textbook-style write-up *for your specific
-   machine*: what a clock cycle is, why one core runs ~6 instructions at once,
-   your actual cache hierarchy drawn by latency cliffs, the branch predictor, SIMD,
-   the TLB, the disk, and (on a Mac) the GPU.
-2. **`dashboard.html`** — a self-contained one-page dashboard of the results you
-   can open offline and share.
+1. **`report.html`** — a chaptered, textbook-style read *for your specific
+   machine*, charts woven into the story: what a clock cycle is, why one core runs
+   ~6 instructions at once, your actual cache hierarchy drawn by latency cliffs,
+   the branch predictor, SIMD, the TLB, the disk, and (on a Mac) the GPU.
+2. **`dashboard.html`** — the same results as a dense one-page data dashboard you
+   can scan, open offline, and share.
+
+(The textbook is also written to `report.md` if you want plain markdown.)
 
 ## What it measures
 
