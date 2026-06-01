@@ -94,14 +94,15 @@ know if a result is high/low.
 
 ### 6. Generate the dashboard (model on `example/dashboard.html`)
 A single self-contained `.html` file (inline CSS + inline SVG, no external
-dependencies, opens offline). This is a **dense data readout, not an essay** —
-let the numbers and charts carry it; strip the prose. Pack in THIS machine's
-measured values: headline stat tiles, the memory-hierarchy table with the "1
-cycle = 1 second" scale, inline-SVG line charts for every sweep we have
-(cache-latency-vs-size, core scaling, bandwidth saturation, disk block-size, GPU
-occupancy), and compact key/value cards for the scalar results (superscalar,
-SIMD, branch, TLB, access pattern, disk, GPU, CPU-vs-GPU). Keep narrative/
-explanation in `report.md`; the dashboard is just the data. Then show it to the user.
+dependencies, opens offline). **Data leads; numbers and charts up front** — but
+cap each panel with **one sharp insight line** (the "so what"), never paragraphs.
+Pack in THIS machine's measured values: headline stat tiles, the memory-hierarchy
+table with the "1 cycle = 1 second" scale, inline-SVG line charts for every sweep
+we have (cache-latency-vs-size, core scaling, bandwidth saturation, disk
+block-size, GPU occupancy), and compact key/value cards for the scalar results
+(superscalar, SIMD, branch, TLB, access pattern, disk, GPU, CPU-vs-GPU), each with
+its one-liner. Keep the long-form narrative in `report.md`; the dashboard is the
+data plus a single takeaway per panel. Then show it to the user.
 
 ## Deliverables
 1. The ported benchmark source (so the user can re-run it).
