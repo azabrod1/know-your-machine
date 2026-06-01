@@ -32,7 +32,10 @@ example/
 
 Two HTML deliverables, two jobs: **`textbook.html`** is the deep read (the
 chaptered narrative with its graphics inline); **`dashboard.html`** is the
-glance (dense numbers + charts, one insight line each). Generate both.
+glance (dense numbers + charts, one insight line each). Generate both, and
+**cross-link them** — each page carries a small `[ Textbook | Dashboard ]` toggle
+in its header (current view highlighted, the other a *relative* `href`, since
+both files land in the same folder; this keeps them self-contained and offline).
 
 **The example is written for Apple Silicon (arm64 + macOS).** Your job is to
 *port it to the machine you're actually running on*, run it, and produce the
