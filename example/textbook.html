@@ -98,10 +98,12 @@
 
   <!-- 1 -->
   <h2 id="c1"><span class="c">Chapter 1</span>What is a clock cycle, and how fast does it tick?</h2>
-  <p>A CPU has a heartbeat. A tiny crystal drives a clock signal that ticks billions of times a second, and the
-    processor does its work on those ticks: each <i>cycle</i> is one tick. "4.5&nbsp;GHz" just means 4.5 billion ticks
-    per second. Almost everything about how fast a chip feels traces back to two numbers — how many ticks per second,
-    and how much it gets done per tick.</p>
+  <p>A CPU has a heartbeat. A tiny quartz crystal, with some circuitry, drives a clock signal that ticks billions of
+    times a second, and the processor does its work on those ticks: each <i>cycle</i> is one tick. Why have a clock at
+    all? Because a chip is billions of transistors that must act in <b>lockstep</b> — the tick is the drumbeat they all
+    step to, so each part's result is ready exactly when the next part reaches for it. "4.5&nbsp;GHz" just means 4.5
+    billion of those ticks per second. Almost everything about how fast a chip feels traces back to two numbers — how
+    many ticks per second, and how much it gets done per tick.</p>
   <p>So step one is to find the tick rate. You'd think you could just ask the operating system, but on Apple Silicon you
     can't: the true hardware cycle counter is privileged, off-limits to ordinary programs. So we have to <i>measure</i>
     it, with the trick the entire course is built on:</p>
@@ -126,9 +128,11 @@ system timer) agree on the elapsed time to <span class="hi">0.00%</span></div>
   <!-- 2 -->
   <h2 id="c2"><span class="c">Chapter 2</span>A single core does many things at once</h2>
   <p>Here's the fact that surprises almost everyone. Most people picture a CPU like this: read one instruction, do it,
-    read the next, do it — a tidy single-file line. That mental model has been wrong for about thirty years. A modern
-    core is <b>superscalar</b>: inside that one core are <i>several</i> separate execution units (multiple adders, and
-    more), and in a single cycle it can fire off a whole handful of instructions at the same time.</p>
+    read the next, do it — a tidy single-file line. That mental model has been wrong for about thirty years. The actual
+    work inside a core is done by <b>execution units</b> — small specialized circuits, each able to perform one kind of
+    operation (an adder adds, a multiplier multiplies, a load unit fetches from memory). The surprise is that a core
+    holds <i>several</i> of them and is <b>superscalar</b>: in a single cycle it can hand work to many at once, finishing
+    a whole handful of instructions in the time you'd assume it does just one.</p>
   <p>We can prove it directly. Take our dependent chain from Chapter 1 — which is stuck at one add per cycle because
     each add waits for the last — and compare it to several chains that <i>don't</i> depend on each other. Same total
     number of adds, same one core:</p>
@@ -166,9 +170,12 @@ system timer) agree on the elapsed time to <span class="hi">0.00%</span></div>
 
   <!-- 4 -->
   <h2 id="c4"><span class="c">Chapter 4</span>Now multiply by all the cores</h2>
-  <p>Everything so far happened inside <i>one</i> core. This chip has 18 of them, and each can do all of the above
-    independently. So the obvious question: does the work simply multiply by the number of cores? We run our wide loop
-    on more and more threads at once and watch the total:</p>
+  <p>Everything so far happened inside <i>one</i> core — and a <b>core</b> is a complete, self-contained processor:
+    its own execution units, its own registers, all the machinery from the last three chapters. The move that makes a
+    modern chip fast is to etch <i>many</i> whole cores onto a single piece of silicon, so they run genuinely at the same
+    instant — which is different from one core "multitasking," which is really just one core switching between jobs very
+    quickly. This chip has 18, and each can do all of the above independently. So the obvious question: does the work
+    simply multiply by the number of cores? We run our wide loop on more and more threads at once and watch the total:</p>
   <div class="fig"><h3>total integer throughput (billion/s) vs threads</h3>
     <svg viewBox="0 0 360 166" class="chart">
       <defs><linearGradient id="gS" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--violet)" stop-opacity=".35"/><stop offset="1" stop-color="var(--violet)" stop-opacity="0"/></linearGradient></defs>
@@ -250,11 +257,15 @@ system timer) agree on the elapsed time to <span class="hi">0.00%</span></div>
 
   <!-- 7 -->
   <h2 id="c7"><span class="c">Chapter 7</span>Branches, and how a CPU "predicts" the future</h2>
-  <p>There's a third way to stall a core: an <code>if</code>. A modern core works on a pipeline — it starts later
-    instructions before earlier ones finish, like an assembly line. But at a branch (<code>if x then … else …</code>)
-    it doesn't yet know which way the program will go, so it can't know which instructions to start next. Its solution
-    is to <b>guess</b>, run ahead down the guessed path, and — if the guess was wrong — throw that work away and restart,
-    a penalty of roughly 15 cycles.</p>
+  <p>There's a third way to stall a core, and it comes from the most ordinary thing in programming: an <code>if</code>.
+    To see why, you need one more idea — the <b>pipeline</b>. Running an instruction isn't instantaneous; it takes
+    several steps (fetch it, decode what it means, execute it, store the result). Instead of finishing one instruction
+    completely before starting the next, a core overlaps them like an <b>assembly line</b>: while one instruction is
+    being executed, the next is already being decoded and a third fetched. That overlap is a big part of a core's speed.
+    But an assembly line only works if you know what's coming — and a branch (<code>if x then … else …</code>) is exactly
+    the moment the core <i>doesn't</i>, because which instructions come next depends on a result that isn't ready yet.
+    Its fix is to <b>guess</b> the outcome, keep the line moving down the guessed path, and — if it guessed wrong — flush
+    that half-finished work and restart, a penalty of roughly 15 cycles.</p>
   <p>Here's a clean way to see it. Take an array and sum only the elements ≥ 128. Do it once on a <i>sorted</i> array and
     once on a <i>random</i> one. Same instructions, same amount of data, same memory pattern — the <i>only</i> difference
     is the order of the values:</p>
@@ -305,11 +316,15 @@ v1 = [  4 |  2 |  9 |  6 ]
 
   <!-- 9 -->
   <h2 id="c9"><span class="c">Chapter 9</span>The hidden cache: address translation (the TLB)</h2>
-  <p>Programs don't use real memory addresses. Each program sees its own private, pretend "virtual" addresses, and the
-    hardware translates those into real "physical" ones on every single access — a safety and flexibility feature every
-    modern OS relies on. That translation would be ruinously slow to redo each time, so the chip caches the recent
-    translations in a small dedicated table called the <b>TLB</b>. Miss the TLB and the core has to "walk the page
-    tables" — several extra memory lookups just to <i>find</i> where your data lives, before it can even fetch it.</p>
+  <p>Here's something that sounds impossible: every program on your machine believes it has memory all to itself,
+    starting at address zero. They can't all really be using the same physical chips at the same address — so they
+    aren't. Each program is handed its own private set of <b>virtual</b> addresses (a pretend address space), and the
+    hardware quietly translates those into the <b>physical</b> locations in the real memory chips on <i>every single
+    access</i>. This is what keeps programs isolated — one can't read or scribble on another's memory — and lets the OS
+    place and move data wherever it likes. But redoing that translation on every access would be ruinously slow, so the
+    chip caches the recent translations in a small dedicated table: the <b>TLB</b>. Miss the TLB and the core must "walk
+    the page tables" — several extra memory lookups just to <i>find</i> where your data lives, before it can even fetch
+    it.</p>
   <p>The neat part is you can see this cost completely separate from the data cache. We read the <i>same</i> 128&nbsp;KB
     of data two ways: packed tightly (so it spans only a few memory pages, a few translations) versus spread out one
     item per page (so it spans hundreds of pages, hundreds of translations). The actual data sits in fast L1 cache both
@@ -363,10 +378,13 @@ v1 = [  4 |  2 |  9 |  6 ]
 
   <!-- 11 -->
   <h2 id="c11"><span class="c">Chapter 11</span>The whole chip, for real</h2>
-  <p>We've measured one core deeply and watched cores scale. The last CPU question is about the two big shared resources
-    — raw compute and memory bandwidth — and the surprise is that they behave completely differently as you add cores.
-    Compute keeps climbing all the way to 18 cores (reaching <b>1.9 trillion floating-point ops/sec</b>). Memory
-    bandwidth does not:</p>
+  <p>We've measured one core deeply and watched cores scale. The last CPU question is about <b>memory bandwidth</b> —
+    and it's worth separating that from latency first, because people mix them up. Chapter 5 measured <i>latency</i>:
+    how long you wait for one access, the <i>length</i> of the pipe to memory. <b>Bandwidth</b> is a different thing
+    entirely — how much data the memory system can move <i>per second</i> in total, the <i>width</i> of the pipe. One
+    stalled access is a latency problem; a program streaming through gigabytes is a bandwidth problem. And bandwidth is
+    <b>shared</b> — every core draws from the same memory system — which sets up a surprise. Raw compute keeps climbing
+    all the way to 18 cores (reaching <b>1.9 trillion floating-point ops/sec</b>); memory bandwidth does not:</p>
   <div class="fig"><h3>total memory bandwidth (GB/s) vs threads</h3>
     <svg viewBox="0 0 360 166" class="chart">
       <defs><linearGradient id="gB" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--blue)" stop-opacity=".35"/><stop offset="1" stop-color="var(--blue)" stop-opacity="0"/></linearGradient></defs>
@@ -387,11 +405,15 @@ v1 = [  4 |  2 |  9 |  6 ]
 
   <!-- 12 -->
   <h2 id="c12"><span class="c">Chapter 12</span>The other processor: the GPU</h2>
-  <p>Back in Chapter 8 we said CPU SIMD does a handful of numbers at once, and the "thousands at once" machine is the
-    GPU. Your chip has one built in: a 40-core GPU with roughly 5,000 tiny arithmetic lanes. It reaches
-    <b>14.9 trillion float ops/sec</b> — about 8× the entire CPU — and 578&nbsp;GB/s of bandwidth (more than the CPU
-    could pull, which tells us the chip's memory system is even bigger than Chapter 11 showed). But watch what it takes
-    to get there:</p>
+  <p>The last processor to measure isn't the CPU at all. A <b>GPU</b> (graphics processing unit) was invented to draw
+    images: a screen has millions of pixels, every frame must compute a color for each, and it's the same little
+    calculation repeated millions of times over — an "embarrassingly parallel" job. So GPUs were built the opposite way
+    from CPUs: instead of a few clever cores, <i>thousands</i> of simple arithmetic lanes all doing the same operation on
+    different data. The twist is that almost any massively parallel math — physics, video, and above all the matrix
+    multiplications behind modern AI — fits that same shape, which is why GPUs now run machine learning. Your chip has
+    one built in: a 40-core GPU with roughly 5,000 lanes. It reaches <b>14.9 trillion float ops/sec</b> — about 8× the
+    entire CPU — and 578&nbsp;GB/s of bandwidth (more than the CPU could pull, which tells us the chip's memory system is
+    even bigger than Chapter 11 showed). But watch what it takes to get there:</p>
   <div class="fig"><h3>GPU compute (TFLOP/s) vs how many threads you give it</h3>
     <svg viewBox="0 0 360 166" class="chart">
       <defs><linearGradient id="gG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--lime)" stop-opacity=".35"/><stop offset="1" stop-color="var(--lime)" stop-opacity="0"/></linearGradient></defs>
